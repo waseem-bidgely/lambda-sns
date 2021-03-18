@@ -1,7 +1,5 @@
 provider "aws" {
   region                  = "us-west-2"
-  shared_credentials_file = "/home/rahul-optit/.aws/credentials"
-  profile                 = "nonprodqa"
 }
 
 resource "aws_sns_topic" "topic" {
