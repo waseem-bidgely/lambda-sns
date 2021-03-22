@@ -32,7 +32,7 @@ resource "aws_volume_attachment" "commit-dir-vol" {
 }
 resource "aws_ebs_volume" "data-dir" {
   availability_zone = "us-east-1a"
-  size              = 1500
+  size              = 1024
 }
 resource "aws_volume_attachment" "data-dir-vol" {
   device_name = "/dev/sdc"
