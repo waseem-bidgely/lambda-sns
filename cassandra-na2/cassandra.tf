@@ -1,7 +1,5 @@
 provider "aws" {
   region                  = "us-east-1"
-  shared_credentials_file = "/home/rahul-optit/.aws/credentials"
-  profile                 = "na"
 }
 
 resource "aws_instance" "cassandra" {
