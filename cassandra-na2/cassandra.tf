@@ -17,6 +17,10 @@ resource "aws_instance" "cassandra" {
 
   tags = {
     Name = "ProdNa2-Cassandra"
+    Environment = "Prodna2"
+    Component = "cassandra"
+    Owner = "ops"
+    Utility = "all"
   }
 }
 resource "aws_ebs_volume" "commit-log" {
