@@ -19,7 +19,7 @@ resource "aws_launch_template" "ingesterjobslaunchtemplate" {
     name = "prodca-iam-instance-profile"
   }
 
-  image_id      = "ami-0dcf9abdc83d6e6f7"
+  image_id      = "ami-00ee20a105ccabf35"
   user_data     = "${base64encode(file("ingester.sh"))}"
   instance_type = "m4.xlarge"
   key_name      = "prodca"
@@ -54,8 +54,6 @@ resource "aws_autoscaling_group" "ingesterjobs-od-asg-prodca" {
     version = "$Latest"
   }
 }
-
-
 resource "aws_launch_template" "ingesterclientlaunchtemplate" {
   name = "ingesterclientlaunchtemplate"
 
@@ -72,7 +70,7 @@ resource "aws_launch_template" "ingesterclientlaunchtemplate" {
     name = "prodca-iam-instance-profile"
   }
 
-  image_id      = "ami-0dcf9abdc83d6e6f7"
+  image_id      = "ami-00ee20a105ccabf35"
   user_data     = "${base64encode(file("ingesterclient.sh"))}"
   instance_type = "m4.xlarge"
   key_name      = "prodca"
@@ -173,7 +171,7 @@ resource "aws_launch_template" "aggregationslaunchtemplate" {
     name = "prodca-iam-instance-profile"
   }
 
-  image_id      = "ami-0dcf9abdc83d6e6f7"
+  image_id      = "ami-00ee20a105ccabf35"
   user_data     = "${base64encode(file("aggregations.sh"))}"
   instance_type = "m4.xlarge"
   key_name      = "prodca"
@@ -223,7 +221,7 @@ resource "aws_launch_template" "daemons3launchtemplate" {
     name = "prodca-iam-instance-profile"
   }
 
-  image_id      = "ami-0dcf9abdc83d6e6f7"
+  image_id      = "ami-00ee20a105ccabf35"
   user_data     = "${base64encode(file("coretool.sh"))}"
   instance_type = "m4.xlarge"
   key_name      = "prodca"
@@ -273,7 +271,7 @@ resource "aws_launch_template" "uploadsplitterserviceslaunchtemplate" {
     name = "prodca-iam-instance-profile"
   }
 
-  image_id      = "ami-0dcf9abdc83d6e6f7"
+  image_id      = "ami-00ee20a105ccabf35"
   user_data     = "${base64encode(file("uploadsplitterservices.sh"))}"
   instance_type = "m4.xlarge"
   key_name      = "prodca"
@@ -305,6 +303,59 @@ resource "aws_autoscaling_group" "uploadsplitterservices-asg-prodca" {
   min_size           = 1
   launch_template {
     id      = aws_launch_template.uploadsplitterserviceslaunchtemplate.id
+    version = "$Latest"
+  }
+}
+
+
+resource "aws_launch_template" "pyamidisaggprioritylaunchtemplate" {
+  name = "pyamidisaggprioritylaunchtemplate"
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size = 30
+      volume_type = "gp2"
+
+    }
+  }
+  iam_instance_profile {
+    name = "prodca-iam-instance-profile"
+  }
+
+  image_id      = "ami-0d6d536a37610d8b8"
+  user_data     = "${base64encode(file("pyamidisaggpriority.sh"))}"
+  instance_type = "m4.xlarge"
+  key_name      = "prodca"
+
+  network_interfaces {
+    associate_public_ip_address = false
+    subnet_id                   = "subnet-0b203fd84612bcbd1"
+    security_groups             = ["sg-0a3db65a3dad9644f"]
+
+  }
+
+  placement {
+    availability_zone = "ca-central-1a"
+  }
+
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "pyamidisaggpriority"
+    }
+  }
+}
+resource "aws_autoscaling_group" "pyamidisaggpriority-od-asg-prodca" {
+  availability_zones = ["ca-central-1a"]
+  desired_capacity   = 1
+  max_size           = 1
+  min_size           = 1
+  launch_template {
+    id      = aws_launch_template.pyamidisaggprioritylaunchtemplate.id
     version = "$Latest"
   }
 }
