@@ -3,6 +3,7 @@ provider "aws" {
 }
 resource "aws_sns_topic" "topic" {
   name = "s3-event-notification-topic"
+}
 
 resource "aws_s3_bucket" "bucket" {
   bucket = "var.bucket"
