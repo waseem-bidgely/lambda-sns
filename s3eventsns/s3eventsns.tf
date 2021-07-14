@@ -1,3 +1,6 @@
+provider "aws" {
+  region                  = "us-west-2"
+}
 resource "aws_sns_topic" "topic" {
   name = "s3-event-notification-topic"
 
