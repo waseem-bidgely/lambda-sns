@@ -30,3 +30,4 @@ ip=`/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}'`
 sed -i 's/192.168.10.10/'"$ip"'/g' /etc/cassandra/cassandra.yaml;
 sed -i 's#/var/lib/cassandra/data#/mnt2/cassandra/data#g' /etc/cassandra/cassandra.yaml
 sed -i 's#/var/lib/cassandra/commitlog#/mnt1/cassandra/commitlog#g' /etc/cassandra/cassandra.yaml
+sed -i.bak "/^[[:space:]]*hinted_handoff_enabled:/ s/:.*/: false/" /etc/cassandra/cassandra.yaml
