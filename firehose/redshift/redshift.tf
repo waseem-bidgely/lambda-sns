@@ -7,7 +7,7 @@ resource "aws_kinesis_firehose_delivery_stream" "test_stream" {
     bucket_arn      = "arn:aws:s3:::common-metrics-prod-ca"
     buffer_size     = 5
     buffer_interval = 300
-    prefix          = var.name/
+    prefix          = var.prefix/
   }
 
   redshift_configuration {
