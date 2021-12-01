@@ -1,3 +1,5 @@
+provider "aws" {
+}
 resource "aws_kinesis_firehose_delivery_stream" "test_stream" {
   name        = var.name
   destination = "redshift"
