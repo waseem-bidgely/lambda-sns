@@ -17,7 +17,7 @@ resource "aws_kinesis_firehose_delivery_stream" "test_stream" {
     cluster_jdbcurl = "jdbc:redshift://canada-prodca-redshiftcluster.cdozp90tzpyi.ca-central-1.redshift.amazonaws.com:5439/bdw"
     username        = "badm"
     password        = var.password
-    data_table_name = var.name
+    data_table_name = var.prefix
     copy_options    = "TIMEFORMAT AS 'epochmillisecs' json 'auto'"
     s3_backup_mode  = "Disabled"
   }
