@@ -55,3 +55,7 @@ variable "AWS_DEFAULT_REGION" {
 variable "BIDGELY_ENV" {
   type = string
 }
+variable "AIRFLOW__API__AUTH_BACKEND" {
+  type = string
+
+}
