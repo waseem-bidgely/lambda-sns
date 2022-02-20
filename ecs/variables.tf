@@ -59,3 +59,21 @@ variable "AIRFLOW__API__AUTH_BACKEND" {
   type = string
 
 }
+variable "account" {
+  type = string
+
+}
+variable "region" {
+  type = string
+
+}
+variable "image" {
+  type = string
+}
+variable "subnet" {
+  type = list(any)
+}
+variable "vpc" {
+  type = string
+
+}
