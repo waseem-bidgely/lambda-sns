@@ -362,9 +362,9 @@ resource "aws_ecs_service" "aws-ecs-service" {
   }
 
   network_configuration {
-    subnets          = ["subnet-63443d05"]
+    subnets          = ["var.privatesubnet"]
     assign_public_ip = false
-    security_groups  = ["sg-0734172aa5832406d"]
+    security_groups  = [aws_security_group.allow_all.id]
   }
   health_check_grace_period_seconds = 2147483647
 
@@ -425,9 +425,9 @@ resource "aws_ecs_service" "aws-ecs-worker" {
   }
 
   network_configuration {
-    subnets          = ["subnet-63443d05"]
+    subnets          = ["var.privatesubnet"]
     assign_public_ip = false
-    security_groups  = ["sg-0734172aa5832406d"]
+    security_groups  = [aws_security_group.allow_all.id]
   }
 
   service_registries {
