@@ -129,8 +129,8 @@ DEFINITION
   task_role_arn            = var.ecs_role
   execution_role_arn       = var.ecs_role
 }
-resource "aws_ecs_task_definition" "airflow-worker" {
-  family                   = "airflow-worker"
+resource "aws_ecs_task_definition" "airflow-worker-tf" {
+  family                   = "airflow-worker-tf"
   container_definitions    = <<DEFINITION
   [
     {
@@ -288,6 +288,59 @@ resource "aws_lb_listener" "listener-https" {
 resource "aws_ecs_cluster" "aws-ecs-cluster" {
   name = "airflow-${var.BIDGELY_ENV}-cluster"
 }
+resource "aws_autoscaling_group" "ecs-cluster" {
+  name                 = var.asg_name
+  min_size             = "2"
+  max_size             = "2"
+  desired_capacity     = "2"
+  health_check_type    = "EC2"
+  launch_configuration = aws_launch_configuration.instance.name
+  vpc_zone_identifier  = [var.vpc_zone_identifier]
+}
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = var.vpc_id
+  ingress {
+    description = "all from VPC"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "all"
+    cidr_blocks = [data.aws_vpc.selected.cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+resource "aws_launch_configuration" "instance" {
+  name                        = var.launch_configuration
+  image_id                    = var.ami
+  instance_type               = var.instance_type
+  iam_instance_profile        = var.iam_instance_profile
+  security_groups             = [aws_security_group.allow_all.id]
+  key_name                    = var.key_name
+  associate_public_ip_address = true
+  user_data                   = <<EOF
+#!/bin/bash
+echo ECS_CLUSTER=airflow-${var.BIDGELY_ENV}-cluster >> /etc/ecs/ecs.config
+EOF
+
+
+
+
+  root_block_device {
+    volume_size = "30"
+    volume_type = "gp2"
+  }
+}
 data "aws_ecs_task_definition" "main" {
   task_definition = aws_ecs_task_definition.airflow-tf.family
 }
@@ -339,6 +392,62 @@ resource "aws_service_discovery_service" "airflow-master" {
 
   dns_config {
     namespace_id   = aws_service_discovery_private_dns_namespace.airflow-master.id
+    routing_policy = "MULTIVALUE"
+
+    dns_records {
+      ttl  = 60
+      type = "A"
+    }
+
+
+  }
+}
+data "aws_ecs_task_definition" "worker" {
+  task_definition = aws_ecs_task_definition.airflow-worker-tf.family
+}
+
+
+resource "aws_ecs_service" "aws-ecs-worker" {
+  name                 = "worker"
+  cluster              = aws_ecs_cluster.aws-ecs-cluster.id
+  task_definition      = "${aws_ecs_task_definition.airflow-worker-tf.family}:${max(aws_ecs_task_definition.airflow-worker-tf.revision, data.aws_ecs_task_definition.worker.revision)}"
+  launch_type          = "EC2"
+  scheduling_strategy  = "REPLICA"
+  desired_count        = 1
+  force_new_deployment = true
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "attribute:ecs.availability-zone"
+  }
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
+  }
+
+  network_configuration {
+    subnets          = ["subnet-63443d05"]
+    assign_public_ip = false
+    security_groups  = ["sg-0734172aa5832406d"]
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.airflow-worker.arn
+  }
+
+}
+
+
+resource "aws_service_discovery_private_dns_namespace" "airflow-worker" {
+  name        = "airflow-worker-qa"
+  description = "example"
+  vpc         = var.vpc
+}
+
+resource "aws_service_discovery_service" "airflow-worker" {
+  name = "airflow-worker-qa"
+
+  dns_config {
+    namespace_id   = aws_service_discovery_private_dns_namespace.airflow-worker.id
     routing_policy = "MULTIVALUE"
 
     dns_records {
