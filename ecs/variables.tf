@@ -77,3 +77,40 @@ variable "vpc" {
   type = string
 
 }
+variable "vpc_id" {
+  type = string
+
+}
+
+variable "cluster_name" {
+  type = string
+
+}
+variable "asg_name" {
+  type = string
+
+}
+variable "vpc_zone_identifier" {
+  type = string
+
+}
+variable "launch_configuration" {
+  type = string
+
+}
+variable "ami" {
+  type = string
+
+}
+variable "instance_type" {
+  type = string
+
+}
+variable "iam_instance_profile" {
+  type = string
+
+}
+variable "key_name" {
+  type = string
+
+}
