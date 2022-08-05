@@ -18,7 +18,7 @@ resource "aws_lambda_function" "lambda" {
   s3_key        = "zips/rmp/nsm-1.sakshi-NSMDisagg.303.zip"
   role          = "arn:aws:iam::189675173661:role/lamda-ec2-ami-role"
   handler       = "nsm_lambda.lambda_handler"
-  runtime       = "python3.6"
+  runtime       = "python3.7"
   timeout       = 300
   memory_size   = 1024
 }
